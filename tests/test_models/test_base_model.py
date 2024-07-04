@@ -1,37 +1,78 @@
 #!/usr/bin/python3
-import os
+"""Unittest for BaseModel class"""
 import unittest
+from datetime import datetime
 from models.base_model import BaseModel
 
+
 class TestBaseModel(unittest.TestCase):
-    def test_init(self):
-        """ Test initialization of BaseModel instance """
-        base_model = BaseModel()
-        self.assertIsInstance(base_model.id, str)
-        self.assertIsNotNone(base_model.created_at)
-        self.assertIsNotNone(base_model.updated_at)
+    """Test cases for the BaseModel class"""
 
-    def test_str(self):
-         """Test string representation of BaseModel instance"""
-         base_model = BaseModel()
-         self.assertIsInstance(str(base_model), str)
+    def setUp(self):
+        """Set up test methods"""
+        self.base_model = BaseModel()
 
-    def test_save(self):
-         """Test if save method updates updated_at attribute"""
-         initial_updated_at = base_model.updated_at
-         base_model.save()
-         self.assertNotEqual(initial_updated_at, base_model.updated_at)
+    def tearDown(self):
+        """Tear down test methods"""
+        pass
 
-    def test_to_dict(self):
-        """ Test conversion of BaseModel instance to dictionary """
-        base_model = BaseModel()
-        base_model.name = "Test Model"
-        base_model.my_number = 42
-        base_model_dict = base_model.to_dict()
+    def test_instantiation(self):
+        """Test instantiation of BaseModel class"""
+        self.assertIsInstance(self.base_model, BaseModel)
+
+    def test_id_is_string(self):
+        """Test if id is a string"""
+        self.assertIsInstance(self.base_model.id, str)
+
+    def test_created_at_is_datetime(self):
+        """Test if created_at is a datetime object"""
+        self.assertIsInstance(self.base_model.created_at, datetime)
+
+    def test_updated_at_is_datetime(self):
+        """Test if updated_at is a datetime object"""
+        self.assertIsInstance(self.base_model.updated_at, datetime)
+
+    def test_str_representation(self):
+        """Test the __str__ method"""
+        string = str(self.base_model)
+        self.assertIn("[BaseModel]", string)
+        self.assertIn("id", string)
+        self.assertIn("created_at", string)
+        self.assertIn("updated_at", string)
+
+    def test_save_method(self):
+        """Test the save method"""
+        old_updated_at = self.base_model.updated_at
+        self.base_model.save()
+        self.assertNotEqual(old_updated_at, self.base_model.updated_at)
+
+    def test_to_dict_method(self):
+        """Test the to_dict method"""
+        base_model_dict = self.base_model.to_dict()
         self.assertIsInstance(base_model_dict, dict)
         self.assertEqual(base_model_dict['__class__'], 'BaseModel')
-        self.assertEqual(base_model_dict['name'], 'Test Model')
-        self.assertEqual(base_model_dict['my_number'], 42)
+        self.assertIsInstance(base_model_dict['created_at'], str)
+        self.assertIsInstance(base_model_dict['updated_at'], str)
+
+    def test_instantiation_with_kwargs(self):
+        """Test instantiation with kwargs"""
+        dt = datetime.now()
+        dt_iso = dt.isoformat()
+        bm = BaseModel(id="345", created_at=dt_iso, updated_at=dt_iso)                                                      self.assertEqual(bm.id, "345")
+        self.assertEqual(bm.created_at, dt)
+        self.assertEqual(bm.updated_at, dt)
+
+    def test_instantiation_with_None_kwargs(self):
+        """Test instantiation with None kwargs"""
+        with self.assertRaises(TypeError):
+            BaseModel(id=None, created_at=None, updated_at=None)
+
+    def test_instantiation_with_args(self): 
+        """Test that instantiation with args works correctly"""
+        bm = BaseModel("1234", "Hello")                                                                                     self.assertNotIn("1234", bm.__dict__.values())
+        self.assertNotIn("Hello", bm.__dict__.values())
+
+    def test_instantiation_with_kwargs_and_args(self):
 
 
 
